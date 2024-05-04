@@ -21,8 +21,8 @@ jobs:
       with:
         dotnet-version: 8.0.x
     - name: Restore dependencies
-      run: dotnet restore .\src\QuokkaVec.Server\
+      run: dotnet restore .\src\QuokkaVec.Server\QuokkaVec.Server.sln
     - name: Build
-      run: dotnet build --no-restore .\src\QuokkaVec.Server\
+      run: dotnet build --no-restore .\src\QuokkaVec.Server\QuokkaVec.Server.sln
     - name: Test
-      run: dotnet test --no-build --verbosity normal .\src\QuokkaVec.Server\
+      run: dotnet test --no-build --verbosity normal .\src\QuokkaVec.Server\QuokkaVec.Server.sln
