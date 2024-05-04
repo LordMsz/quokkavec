@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34728.123
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuokkaVec.Console", "QuokkaVec.Console\QuokkaVec.Console.csproj", "{38347639-3C6C-4C63-87E3-1B1F137598CB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{38347639-3C6C-4C63-87E3-1B1F137598CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38347639-3C6C-4C63-87E3-1B1F137598CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38347639-3C6C-4C63-87E3-1B1F137598CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38347639-3C6C-4C63-87E3-1B1F137598CB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {54BB4310-44CB-4F11-8415-E92EBA256BD6}
+	EndGlobalSection
+EndGlobal
