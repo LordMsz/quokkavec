@@ -9,6 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AWSSDK.BedrockAgentRuntime" Version="3.7.306.1" />
+    <PackageReference Include="AWSSDK.BedrockRuntime" Version="3.7.302.7" />
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="8.0.0" />
     <PackageReference Include="Microsoft.SemanticKernel" Version="1.10.0" />
