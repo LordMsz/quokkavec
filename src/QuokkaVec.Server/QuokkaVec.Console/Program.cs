@@ -1,9 +1,19 @@
 ﻿// See https://aka.ms/new-console-template for more information
+using Amazon;
+using Amazon.BedrockAgentRuntime.Model;
+using Amazon.BedrockRuntime;
+using Amazon.BedrockRuntime.Model;
+using Amazon.Util;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Embeddings;
+using Microsoft.SemanticKernel.TextGeneration;
 using Qdrant.Client;
 using Qdrant.Client.Grpc;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 
 Console.WriteLine("Hello, Quokkas!");
 #pragma warning disable SKEXP0010 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
@@ -16,81 +26,21 @@ var builder = new ConfigurationBuilder()
 			.AddEnvironmentVariables();
 
 IConfigurationRoot configuration = builder.Build();
+
+// Amazon Bedrock experiment
 // in dev-time thise uses user secrets
 // in prod-time this uses environment variables
-string openAIAPIKey = configuration["OpenAIAPIKey"] ?? string.Empty;
+//string awsAccessKeyId = configuration["AWSAccessKeyId"] ?? string.Empty;
 
-if (string.IsNullOrWhiteSpace(openAIAPIKey))
-{
-	Console.WriteLine("OpenAIAPIKey is not set, use 'dotnet user-secrets init' and 'dotnet user-secrets set OpenAIAPIKey <your key>' to set the key, exiting...");
-	return;
-}
+// use amazon sdk to retreive data from knowledge base
+var bedrockAgentClient = new Amazon.BedrockAgentRuntime.AmazonBedrockAgentRuntimeClient(RegionEndpoint.USEast1);
+var r = await bedrockAgentClient.RetrieveAndGenerateAsync(new RetrieveAndGenerateRequest { Input = "Hello, Quokkas!" });
+Console.WriteLine(r.Output);
 
-// Semantic Kernel init
-var kerbelBuilder = Kernel.CreateBuilder();
-kerbelBuilder.AddOpenAITextEmbeddingGeneration("text-embedding-3-small", openAIAPIKey);
-
-var kernel = kerbelBuilder.Build();
-
-var embeddingGenerationService = kernel.GetRequiredService<ITextEmbeddingGenerationService>();
-
-// Vector DB (Qdrant) init
-// TODO: look at Semntic Kernel for Qdrant integration
-var collectionName = "test";
-var qdrantClient = new QdrantClient("localhost");
-if (!await qdrantClient.CollectionExistsAsync(collectionName))
-{
-	await qdrantClient.CreateCollectionAsync(collectionName, new VectorParams { Size = 1536, Distance = Distance.Cosine });
-}
 
 // TODO: use Semantic Kernel with custom model for LocalAI Embeddings
 // https://github.com/microsoft/semantic-kernel/blob/main/dotnet/README.md
 
-// read input from user, get path to folder to index
-Console.WriteLine("Enter path to folder to index:");
-var path = Console.ReadLine();
-
-if (string.IsNullOrWhiteSpace(path))
-{
-	Console.WriteLine("Path is empty, exiting...");
-	return;
-}
-// index all files in the folder
-var files = Directory.GetFiles(path, "*", SearchOption.AllDirectories);
-int i = 0;
-foreach (var file in files)
-{
-	var text = await File.ReadAllTextAsync(file);
-	// take only first 1k characters
-	text = text.Substring(0, Math.Min(1000, text.Length));
-	ReadOnlyMemory<float> embedding = await embeddingGenerationService.GenerateEmbeddingAsync(text);
-
-	var points = new List<PointStruct>()
-	{
-		new PointStruct
-		{
-			Id = new PointId { Num = (ulong)i },
-			Vectors = embedding.ToArray(),
-			Payload = { { "fileName", file } }
-		}
-	};
-	var updateResult = await qdrantClient.UpsertAsync(collectionName, points);
-	Console.WriteLine($"File {file} indexed, result: {updateResult}");
-
-	i++;
-}
-
-// search test
-Console.WriteLine("Enter search query:");
-var query = Console.ReadLine();
-
-var queryVector = await embeddingGenerationService.GenerateEmbeddingAsync(query);
-var searchResult = await qdrantClient.SearchAsync(collectionName, queryVector.ToArray(), limit: 2);
-
-foreach (var result in searchResult)
-{
-	Console.WriteLine($"File: {result.Payload["fileName"]}, Score: {result.Score}");
-}
 
 #pragma warning restore SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 #pragma warning restore SKEXP0010 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
